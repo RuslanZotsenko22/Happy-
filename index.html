@@ -18,7 +18,7 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        color: #b20059;
+        color: #ff0000; /* яскраво червоний текст */
       }
 
       #animationCanvas {
@@ -52,6 +52,8 @@
         max-width: 90vw;
         line-height: 1.4;
         color: #ff0000;
+        z-index: 25;
+        position: relative;
       }
 
       #surpriseBtn {
@@ -67,22 +69,113 @@
         transition: opacity 1s ease;
         user-select: none;
         box-shadow: 0 5px 15px rgba(255, 64, 129, 0.5);
+        z-index: 25;
+        position: relative;
       }
 
       #surpriseBtn:hover {
-        background-color: #ff0000;
+        background-color: #e040fb;
         box-shadow: 0 8px 20px rgba(224, 64, 251, 0.7);
       }
 
       #surpriseMessage {
         margin-top: 25px;
         font-size: 2rem;
-        color: #ff0000;
+        color: #d500f9;
         opacity: 0;
         transition: opacity 1.5s ease;
         max-width: 90vw;
         text-align: center;
         user-select: none;
+        z-index: 25;
+        position: relative;
+      }
+
+      /* Плаваючі фото */
+      .floating-photo {
+        position: fixed;
+        bottom: -150px; /* стартує нижче екрану */
+        width: 120px; /* збільшений розмір */
+        border-radius: 12px;
+        opacity: 0.7;
+        filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.3));
+        pointer-events: none;
+        user-select: none;
+        object-fit: cover;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+        z-index: 20;
+      }
+
+      /* Рух знизу вгору з невеликими зсувами по горизонталі */
+      @keyframes floatUp1 {
+        0% {
+          transform: translateX(0) translateY(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateX(30px) translateY(-110vh);
+          opacity: 0;
+        }
+      }
+
+      @keyframes floatUp2 {
+        0% {
+          transform: translateX(0) translateY(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateX(-25px) translateY(-120vh);
+          opacity: 0;
+        }
+      }
+
+      @keyframes floatUp3 {
+        0% {
+          transform: translateX(0) translateY(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateX(35px) translateY(-115vh);
+          opacity: 0;
+        }
+      }
+
+      @keyframes floatUp4 {
+        0% {
+          transform: translateX(0) translateY(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateX(-20px) translateY(-118vh);
+          opacity: 0;
+        }
+      }
+
+      @keyframes floatUp5 {
+        0% {
+          transform: translateX(0) translateY(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateX(25px) translateY(-112vh);
+          opacity: 0;
+        }
       }
     </style>
   </head>
@@ -90,19 +183,69 @@
     <canvas id="animationCanvas"></canvas>
     <div id="overlay"></div>
 
+    <!-- Плаваючі фото -->
+    <img
+      src="photo/photo_5.jpg"
+      alt="Фото 1"
+      class="floating-photo"
+      style="left: 10%; animation-name: floatUp1; animation-duration: 25s"
+    />
+    <img
+      src="photo/photo_4.jpg"
+      alt="Фото 2"
+      class="floating-photo"
+      style="
+        left: 30%;
+        animation-name: floatUp2;
+        animation-duration: 23s;
+        animation-delay: 5s;
+      "
+    />
+    <img
+      src="photo/photo_3.jpg"
+      alt="Фото 3"
+      class="floating-photo"
+      style="
+        left: 50%;
+        animation-name: floatUp3;
+        animation-duration: 27s;
+        animation-delay: 3s;
+      "
+    />
+    <img
+      src="photo/photo_2.jpg"
+      alt="Фото 4"
+      class="floating-photo"
+      style="
+        left: 70%;
+        animation-name: floatUp4;
+        animation-duration: 24s;
+        animation-delay: 7s;
+      "
+    />
+    <img
+      src="photo/photo_1.jpg"
+      alt="Фото 5"
+      class="floating-photo"
+      style="
+        left: 85%;
+        animation-name: floatUp5;
+        animation-duration: 28s;
+        animation-delay: 2s;
+      "
+    />
+
     <div
       id="content"
-      style="z-index: 20; position: relative; text-align: center"
+      style="z-index: 25; position: relative; text-align: center"
     >
       <div id="greetingText">
-        🎉 Вітаю!🎉<br />
-        Бажаю тобі неймовірного щастя, любові та здійснення мрій!
+        🎉 З Днем Народження, Танюшка!<br />
+        З твоїм 10-м вісімнадцятиріччям 🎉
       </div>
       <button id="surpriseBtn">ТУТ</button>
       <div id="surpriseMessage">
-        🎉 З Днем Народження,<br />
-        Танюшка! <br />
-        🎉 З твоїм 10-м вісімнадцятиріччям 🎉
+        🎉 Вітаю! Бажаю тобі неймовірного щастя, любові та здійснення мрій! 🎉
       </div>
     </div>
 
