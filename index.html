@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Вітання Танюшці</title>
+    <style>
+      /* Базові стилі */
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: #fff0f5;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        color: #b20059;
+      }
+
+      #animationCanvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 10;
+        background: transparent;
+      }
+
+      #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: transparent;
+        z-index: 15;
+        transition: background-color 2s ease;
+      }
+
+      #greetingText {
+        font-size: 2.5rem;
+        text-align: center;
+        margin: 0 20px;
+        opacity: 0;
+        transition: opacity 3s ease;
+        max-width: 90vw;
+        line-height: 1.4;
+        color: #ff0000;
+      }
+
+      #surpriseBtn {
+        margin-top: 30px;
+        padding: 15px 30px;
+        font-size: 1.5rem;
+        background-color: #ff4081;
+        border: none;
+        border-radius: 25px;
+        color: white;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 1s ease;
+        user-select: none;
+        box-shadow: 0 5px 15px rgba(255, 64, 129, 0.5);
+      }
+
+      #surpriseBtn:hover {
+        background-color: #ff0000;
+        box-shadow: 0 8px 20px rgba(224, 64, 251, 0.7);
+      }
+
+      #surpriseMessage {
+        margin-top: 25px;
+        font-size: 2rem;
+        color: #ff0000;
+        opacity: 0;
+        transition: opacity 1.5s ease;
+        max-width: 90vw;
+        text-align: center;
+        user-select: none;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="animationCanvas"></canvas>
+    <div id="overlay"></div>
+
+    <div
+      id="content"
+      style="z-index: 20; position: relative; text-align: center"
+    >
+      <div id="greetingText">
+        🎉 Вітаю!🎉<br />
+        Бажаю тобі неймовірного щастя, любові та здійснення мрій!
+      </div>
+      <button id="surpriseBtn">ТУТ</button>
+      <div id="surpriseMessage">
+        🎉 З Днем Народження, Танюшка! <br />
+        З твоїм 10-м вісімнадцятиріччям 🎉
+      </div>
+    </div>
+
+    <audio
+      id="bgMusic"
+      src="Audio/happy-birthday-368842.mp3"
+      preload="auto"
+    ></audio>
+
+    <script>
+      // Музика автоматично запускається (більшість браузерів забороняють автозапуск без взаємодії)
+      const music = document.getElementById("bgMusic");
+      function tryPlayMusic() {
+        music.play().catch(() => {
+          // Якщо автозапуск заблоковано, запускаємо після першого кліку
+          window.addEventListener("click", () => music.play(), { once: true });
+        });
+      }
+      tryPlayMusic();
+
+      // Елементи DOM
+      const overlay = document.getElementById("overlay");
+      const greetingText = document.getElementById("greetingText");
+      const surpriseBtn = document.getElementById("surpriseBtn");
+      const surpriseMessage = document.getElementById("surpriseMessage");
+
+      // Canvas setup
+      const canvas = document.getElementById("animationCanvas");
+      const ctx = canvas.getContext("2d");
+      let W, H;
+      function resize() {
+        W = window.innerWidth;
+        H = window.innerHeight;
+        canvas.width = W;
+        canvas.height = H;
+      }
+      resize();
+      window.addEventListener("resize", resize);
+
+      // Частинки: сердечка, зірки, феєрверки
+      const particles = [];
+
+      class Particle {
+        constructor(x, y, type) {
+          this.x = x;
+          this.y = y;
+          this.type = type; // heart, star, firework
+          this.size = Math.random() * 15 + 10;
+          this.speedX = (Math.random() - 0.5) * 0.5; // повільний рух у будь-яку сторону
+          this.speedY = (Math.random() - 0.5) * 0.5;
+          this.opacity = 1;
+          this.life = 200 + Math.random() * 100;
+          this.angle = Math.random() * Math.PI * 2;
+          this.rotationSpeed = (Math.random() - 0.5) * 0.01;
+        }
+
+        drawHeart(ctx) {
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          ctx.rotate(this.angle);
+          ctx.scale(this.size / 20, this.size / 20);
+          ctx.fillStyle = `rgba(255, 0, 100, ${this.opacity})`;
+          ctx.beginPath();
+          ctx.moveTo(0, -5);
+          ctx.bezierCurveTo(0, -15, 10, -15, 10, -5);
+          ctx.bezierCurveTo(10, 0, 0, 5, 0, 10);
+          ctx.bezierCurveTo(0, 5, -10, 0, -10, -5);
+          ctx.bezierCurveTo(-10, -15, 0, -15, 0, -5);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        drawStar(ctx) {
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          ctx.rotate(this.angle);
+          ctx.fillStyle = `rgba(255, 215, 0, ${this.opacity})`;
+          ctx.beginPath();
+          for (let i = 0; i < 5; i++) {
+            ctx.lineTo(0, this.size);
+            ctx.translate(0, this.size);
+            ctx.rotate((Math.PI * 2) / 10);
+            ctx.lineTo(0, -this.size);
+            ctx.translate(0, -this.size);
+            ctx.rotate(-(Math.PI * 6) / 10);
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        }
+
+        drawFirework(ctx) {
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          ctx.fillStyle = `rgba(255, 165, 0, ${this.opacity})`;
+          ctx.beginPath();
+          ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+
+          // Зациклюємо по краях екрану
+          if (this.x < 0) this.x = W;
+          else if (this.x > W) this.x = 0;
+          if (this.y < 0) this.y = H;
+          else if (this.y > H) this.y = 0;
+
+          this.opacity -= 0.002; // повільне згасання
+          this.angle += this.rotationSpeed;
+          this.life--;
+          if (this.life <= 0 || this.opacity <= 0) {
+            return false;
+          }
+          return true;
+        }
+
+        draw(ctx) {
+          if (this.type === "heart") this.drawHeart(ctx);
+          else if (this.type === "star") this.drawStar(ctx);
+          else if (this.type === "firework") this.drawFirework(ctx);
+        }
+      }
+
+      function spawnParticles() {
+        // Генеруємо частинки випадково по екрану
+        const types = ["heart", "star", "firework"];
+        const count = Math.floor(Math.random() * 2) + 1;
+        for (let i = 0; i < count; i++) {
+          const x = Math.random() * W;
+          const y = Math.random() * H;
+          const type = types[Math.floor(Math.random() * types.length)];
+          particles.push(new Particle(x, y, type));
+        }
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, W, H);
+        spawnParticles();
+        for (let i = particles.length - 1; i >= 0; i--) {
+          if (!particles[i].update()) {
+            particles.splice(i, 1);
+          } else {
+            particles[i].draw(ctx);
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+
+      // Затемнення і показ привітання через 25 секунд
+      setTimeout(() => {
+        overlay.style.backgroundColor = "rgba(0,0,0,0.7)";
+        greetingText.style.opacity = "1";
+      }, 25000);
+
+      // Поява кнопки "ТУТ" через 10 секунд
+      setTimeout(() => {
+        surpriseBtn.style.opacity = "1";
+      }, 10000);
+
+      // Клік по кнопці "ТУТ" показує сюрприз і ховає кнопку
+      surpriseBtn.addEventListener("click", () => {
+        surpriseMessage.style.opacity = "1";
+        surpriseBtn.style.display = "none"; // ховаємо кнопку
+      });
+    </script>
+  </body>
+</html>
